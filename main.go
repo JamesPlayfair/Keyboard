@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"os"
 	"sort"
 	"strings"
@@ -21,7 +22,10 @@ type kv struct {
 }
 
 func lhs(ch byte) bool {
-	return (strings.Contains("zxqjkhryeaiou", string(ch)))
+	return (strings.Contains(
+		"zouj"+
+			"eairk"+
+			"xqyh", string(ch)))
 }
 
 func main() {
@@ -102,14 +106,26 @@ func main() {
 
 	lhsTot := 0
 	grandTot := 0
-	for _, v := range sortFreqs {
+	bias := ""
+	for i, v := range sortFreqs {
 		if lhs(v.key) {
 			lhsTot += v.total
 		}
 		grandTot += v.total
-		fmt.Printf("%v(%v:%v:%v) ", string(v.key), v.total, v.lhs, v.rhs)
+		bias = "<"
+		if v.lhs > v.rhs {
+			bias = ">"
+		}
+		if math.Abs(float64(v.lhs-v.rhs)) < 3.0 {
+			bias = "="
+		}
+		if i%8 == 0 {
+			fmt.Println()
+		}
+		fmt.Printf("%v(%v:=%v%v%v) ", string(v.key), v.total, v.lhs, bias, v.rhs)
+
 	}
 
-	fmt.Printf("\nLHS = %v out of %v", lhsTot, grandTot)
+	fmt.Printf("\nLHS:RHS = %v:%v", lhsTot, grandTot-lhsTot)
 
 }
